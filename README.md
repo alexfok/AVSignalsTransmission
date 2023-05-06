@@ -8,6 +8,8 @@ python ./q2_main.py waterfall_cif.yuv 352 288 8 hexbs
 https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip 
 ###  run
 ./ffmpeg-master-latest-win64-gpl/bin/ffplay -f rawvideo -pixel_format yuv420p -video_size 1920x1080 road_movie_1920x1080_25.yuv
+./ffmpeg-master-latest-win64-gpl/bin/ffplay -f rawvideo -pixel_format yuv420p -video_size 352x288 ./stv/waterfall_cif.yuv
+
 <!---
 [rawvideo @ 00000116a3dff180] Estimating duration from bitrate, this may be inaccurate
 Input #0, rawvideo, from 'road_movie_1920x1080_25.yuv':

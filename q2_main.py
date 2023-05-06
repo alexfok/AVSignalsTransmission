@@ -5,6 +5,7 @@ import cv2
 
 def read_yuv_file(filename, width, height, frame_index):
     # Read the YUV data for a particular frame into a numpy array
+    # print('read_yuv_file1 frame height: {}, width: {}'.format(height, width))
     num_pixels = width * height
     with open(filename, "rb") as fp:
         fp.seek(num_pixels * 3 // 2 * frame_index)
@@ -12,6 +13,8 @@ def read_yuv_file(filename, width, height, frame_index):
 
     # Extract the Y channel and reshape into a 2D array
     y_plane = buffer[:num_pixels].reshape((height, width))
+    height, width = y_plane.shape
+    # print('read_yuv_file2 frame height: {}, width: {}'.format(height, width))
 
     return y_plane
 
@@ -22,6 +25,7 @@ def calculate_sad(block1, block2):
 def block_matching(frame1, frame2, block_size, search_range):
     # Perform block matching between two frames
     height, width = frame1.shape
+    # print('block_matching frame height: {}, width: {}'.format(height, width))
     matches = []
     for i in range(0, height - block_size + 1, block_size):
         for j in range(0, width - block_size + 1, block_size):
@@ -78,20 +82,22 @@ def display_motion_vectors(filename, width, height, motion_vectors, block_size, 
             move_count += 1
             block_center_x = x
             block_center_y = y
+            frame = cv2.arrowedLine(frame, (x,y), (i,j), color, thickness)
+            print('draw line i: {}, j: {}, x: {}, y: {}'.format(i,j,x,y))
             # x *= scale
             # y *= scale
             # block_center_x = (i + 0.5) * block_size * scale
             # block_center_y = (j + 0.5) * block_size * scale
-            start_point = (int(block_center_x), int(block_center_y))
-            end_point = (int(block_center_x + x), int(block_center_y + y))
-            dx = end_point[0] - start_point[0]
-            dy = end_point[1] - start_point[1]
-            arrow_length = np.sqrt(dx ** 2 + dy ** 2)
-            if arrow_length > arrow_threshold:
-                frame = cv2.arrowedLine(frame, start_point, end_point, color, thickness)
-                print('draw line start_point: {}, end_point: {}, arrow_length: {}'.format(start_point, end_point, arrow_length))
-            else:
-                print('Skip draw line, lenght too small: {}'.format(arrow_length))
+            # start_point = (int(block_center_x), int(block_center_y))
+            # end_point = (int(block_center_x + x), int(block_center_y + y))
+            # dx = end_point[0] - start_point[0]
+            # dy = end_point[1] - start_point[1]
+            # arrow_length = np.sqrt(dx ** 2 + dy ** 2)
+            # if arrow_length > arrow_threshold:
+            #    frame = cv2.arrowedLine(frame, start_point, end_point, color, thickness)
+            #    print('draw line start_point: {}, end_point: {}, arrow_length: {}'.format(start_point, end_point, arrow_length))
+            # else:
+            #    print('Skip draw line, lenght too small: {}'.format(arrow_length))
         else:
             print('block: {}'.format(block))
             not_move_count += 1
@@ -215,12 +221,12 @@ def display_frames_diff(filename, width, height, frame_index1, frame_index2):
 if __name__ == "__main__":
 
     if len(sys.argv) != 6:
-        print("Usage: yuv_reader.py [filename] [width] [height] [block_size] [matching_method]")
+        print("Usage: yuv_reader.py [filename] [height] [width] [block_size] [matching_method]")
         sys.exit(1)
 
     filename = sys.argv[1]
-    width = int(sys.argv[2])
-    height = int(sys.argv[3])
+    height = int(sys.argv[2])
+    width = int(sys.argv[3])
     block_size = int(sys.argv[4])
 
     if sys.argv[5] not in ['full_search', 'hexbs']:
@@ -230,9 +236,10 @@ if __name__ == "__main__":
     matching_method = sys.argv[5]
 
     #matches = frame_matching1(filename, width, height, block_size, matching_method)
-    frame_index1 = 0
-    frame_index2 = 200
+    frame_index1 = 10
+    frame_index2 = 11
     scale = 0.5
     motion_vectors = frame_matching(filename, width, height, frame_index1, frame_index2, block_size, matching_method)
     display_motion_vectors(filename, width, height, motion_vectors, block_size, scale, frame_index1)
     display_frames_diff(filename, width, height, frame_index1, frame_index2)
+#    print(motion_vectors)
