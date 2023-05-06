@@ -1,12 +1,12 @@
-## Python
+# Python
 pip install opencv-python
+# Run main:
+python ./q2_main.py waterfall_cif.yuv 352 288 8 hexbs
 
-
-# ffplay
-## download
+## ffplay
+### download
 https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip 
-## C:\Users\afok\OneDrive - NVIDIA Corporation\Private\BGU\Phd\AVSignalsTransmission\HW1\ffmpeg-master-latest-win64-gpl\bin
-#  run
+###  run
 ./ffmpeg-master-latest-win64-gpl/bin/ffplay -f rawvideo -pixel_format yuv420p -video_size 1920x1080 road_movie_1920x1080_25.yuv
 <!---
 [rawvideo @ 00000116a3dff180] Estimating duration from bitrate, this may be inaccurate
@@ -16,12 +16,12 @@ Input #0, rawvideo, from 'road_movie_1920x1080_25.yuv':
   33.01 M-V:  0.023 fd=   2 aq=    0KB vq=    0KB sq=    0B f=0/0
  
 -->
-# kvazaar
-## download
+## kvazaar
+### download
 https://github.com/ultravideo/kvazaar#docker
 https://docs.docker.com/engine/install/
 docker pull ultravideo/kvazaar 
-## Run kvazaar container
+### Run kvazaar container
 docker run -i -a STDIN -a STDOUT ultravideo/kvazaar -i - --input-res=1920x1080 -o - < road_movie_1920x1080_25.yuv > out.265
 
 ./kvazaar.exe --input waterfall_cif.yuv --output waterfall.hevc --input-res=352x288
@@ -39,7 +39,7 @@ Processed 12 frames,   74855528 bits AVG PSNR Y 38.9601 U 38.7163 V 38.7247
  AVG QP: 24.1
 
 # Q1
-## ####################### tz
+## tz
 ./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_tz.hevc --me tz --bitrate 4000000
  Input: road_movie_1920x1080_25.yuv, output: road_movie_tz.hevc
   Video size: 1920x1080 (input=1920x1080)
@@ -52,7 +52,7 @@ Processed 12 frames,   74855528 bits AVG PSNR Y 38.9601 U 38.7163 V 38.7247
  Bitrate: 3.926 Mbps
  AVG QP: 38.2
 
-## ####################### hexbs
+## hexbs
 ./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 4000000
  Input: road_movie_1920x1080_25.yuv, output: road_movie_hexbs.hevc
   Video size: 1920x1080 (input=1920x1080)
@@ -65,7 +65,7 @@ Processed 12 frames,   74855528 bits AVG PSNR Y 38.9601 U 38.7163 V 38.7247
  Bitrate: 3.924 Mbps
  AVG QP: 38.5
 
-## ####################### dia
+## dia
 ./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_dia.hevc --me dia --bitrate 4000000
  Processed 750 frames,  123686720 bits AVG PSNR Y 32.0134 U 41.3658 V 42.1407
  Total CPU time: 140.403 s.
@@ -76,7 +76,7 @@ Processed 12 frames,   74855528 bits AVG PSNR Y 38.9601 U 38.7163 V 38.7247
  Bitrate: 3.932 Mbps
  AVG QP: 38.4
 
-## ####################### full
+## full
 ./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_full.hevc --me full --bitrate 4000000
  Processed 750 frames,  123626704 bits AVG PSNR Y 32.1875 U 41.3575 V 42.1622
  Total CPU time: 796.435 s.
@@ -102,7 +102,7 @@ python ./yuv_reader_block_match.py waterfall_cif.yuv 352 288 8 hexbs
 --me-steps <integer>   : Motion estimation search step limit. Only
                                affects 'hexbs' and 'dia'. [-1]
 
-# options
+## options
  resolution of the input file is not in the filename
     --input-res=1920x1080
 default input format is 8-bit yuv420p for 8-bit and yuv420p10le for 10-bit
