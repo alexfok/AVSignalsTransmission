@@ -13,8 +13,8 @@ def read_yuv_file(filename, width, height, frame_index):
 
     # Extract the Y channel and reshape into a 2D array
     y_plane = buffer[:num_pixels].reshape((height, width))
-    height, width = y_plane.shape
-    # print('read_yuv_file2 frame height: {}, width: {}'.format(height, width))
+    height1, width1 = y_plane.shape
+    print('read_yuv_file2 frame height: {}, width: {}, height1: {}, width1: {}'.format(height, width, height1, width1))
 
     return y_plane
 
@@ -58,7 +58,17 @@ def frame_matching(filename, width, height, frame_index1, frame_index2, block_si
     #print('search_range: {}', search_range)
     #matches.append(block_matching(frame1, frame2, block_size, search_range))
     return block_matching(frame1, frame2, block_size, search_range)
+def scale_line(i,j,x,y):
+    # x_i = abs(x-i)
+    # if abs(x-i) < 5:
+    #     x_i = 5
+    # y_j = abs(y-j)
+    # if abs(y-j) < 5:
+    #     y_j = 5
 
+    x_i = i + 5
+    y_j = j + 5
+    return x_i, y_j
 def display_motion_vectors(filename, width, height, motion_vectors, block_size, scale, frame_index):
     frame = read_yuv_file(filename, width, height, frame_index)
     # Convert the frame to RGB color space
@@ -66,8 +76,8 @@ def display_motion_vectors(filename, width, height, motion_vectors, block_size, 
     # color = (255, 0, 0)
 
     color = (0, 0, 255)
-    radius = 5
-    thickness = 2
+    radius = 2
+    thickness = 1
     circle_thickness = 2
     scale = 1
     #motion_vectors = motion_vectors[0]
@@ -80,75 +90,18 @@ def display_motion_vectors(filename, width, height, motion_vectors, block_size, 
         x, y = best_match
         if (i, j) != (x,y):
             move_count += 1
-            block_center_x = x
-            block_center_y = y
-            frame = cv2.arrowedLine(frame, (x,y), (i,j), color, thickness)
-            print('draw line i: {}, j: {}, x: {}, y: {}'.format(i,j,x,y))
-            # x *= scale
-            # y *= scale
-            # block_center_x = (i + 0.5) * block_size * scale
-            # block_center_y = (j + 0.5) * block_size * scale
-            # start_point = (int(block_center_x), int(block_center_y))
-            # end_point = (int(block_center_x + x), int(block_center_y + y))
-            # dx = end_point[0] - start_point[0]
-            # dy = end_point[1] - start_point[1]
-            # arrow_length = np.sqrt(dx ** 2 + dy ** 2)
-            # if arrow_length > arrow_threshold:
-            #    frame = cv2.arrowedLine(frame, start_point, end_point, color, thickness)
-            #    print('draw line start_point: {}, end_point: {}, arrow_length: {}'.format(start_point, end_point, arrow_length))
-            # else:
-            #    print('Skip draw line, lenght too small: {}'.format(arrow_length))
+            x_i, y_j = scale_line(i,j,x,y)
+            frame = cv2.arrowedLine(frame, (x_i,y_j), (x,y), color, thickness)
+            print('draw line (x_i,y_j) ({},{}), (x,y) ({},{})'.format(x_i,y_j,x,y))
         else:
             print('block: {}'.format(block))
             not_move_count += 1
             frame = cv2.circle(frame, (x, y), radius, color, circle_thickness)
 
-        """
-         x *= scale
-        y *= scale
-        block_center_x = (i + 0.5) * block_size * scale
-        block_center_y = (j + 0.5) * block_size * scale
-        start_point = (int(block_center_x), int(block_center_y))
-        end_point = (int(block_center_x + x), int(block_center_y + y))
-
-        # Calculate the length of the arrow
-        arrow_threshold = 100
-        dx = end_point[0] - start_point[0]
-        dy = end_point[1] - start_point[1]
-        arrow_length = np.sqrt(dx ** 2 + dy ** 2)
-        # Draw a point or small circle when the arrow is too small
-        print('arrow_length: {}, start_point: {}, end_point: {}'.format(arrow_length, start_point, end_point))
-        if arrow_length < arrow_threshold:
-#            cv2.circle(frame, (x, y), 1, (255, 0, 0), -1)
-            cv2.circle(frame, (x, y), 1, color, -1)
-        else:
-#            frame = cv2.arrowedLine(frame, start_point, end_point, color, thickness)
-            cv2.arrowedLine(frame, start_point, end_point, color, thickness) """
     print('moved blocks count: {}, not moved blocks count: {}'.format(move_count, not_move_count))
     cv2.imshow(f"Motion vectors for frame {frame_index}", frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-def display_motion_vectors1(filename, width, height, motion_vectors, block_size, scale, frame_index):
-    frame = read_yuv_file(filename, width, height, frame_index)
-    frame = frame.copy()
-    frame_width = frame.shape[1]
-    for i in range(motion_vectors.shape[0]):
-        for j in range(motion_vectors.shape[1]):
-            x, y = motion_vectors[i, j]
-            x *= scale
-            y *= scale
-            block_center_x = (i + 0.5) * block_size * scale
-            block_center_y = (j + 0.5) * block_size * scale
-            start_point = (int(block_center_x), int(block_center_y))
-            end_point = (int(block_center_x + x), int(block_center_y + y))
-            color = (0, 0, 255)
-            thickness = 1
-            frame = cv2.arrowedLine(frame, start_point, end_point, color, thickness)
-    cv2.imshow(f"Motion vectors for frame {frame_index}", frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 
 def frame_matching_bad(filename, width, height, frame_index1, frame_index2, block_size, matching_method):
     # Open the YUV file
@@ -217,6 +170,12 @@ def display_frames_diff(filename, width, height, frame_index1, frame_index2):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def display_frame(filename, width, height, frame_index):
+    frame = read_yuv_file(filename, width, height, frame_index)
+    cv2.imshow(f"Motion vectors for frame {frame_index}", frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 # Main code
 if __name__ == "__main__":
 
@@ -236,10 +195,12 @@ if __name__ == "__main__":
     matching_method = sys.argv[5]
 
     #matches = frame_matching1(filename, width, height, block_size, matching_method)
-    frame_index1 = 10
-    frame_index2 = 11
+    frame_index1 = 1
+    frame_index2 = 2
     scale = 0.5
+    display_frame(filename, width, height, frame_index1)
+    display_frame(filename, width, height, frame_index2)
     motion_vectors = frame_matching(filename, width, height, frame_index1, frame_index2, block_size, matching_method)
-    display_motion_vectors(filename, width, height, motion_vectors, block_size, scale, frame_index1)
-    display_frames_diff(filename, width, height, frame_index1, frame_index2)
+    display_motion_vectors(filename, width, height, motion_vectors, block_size, scale, frame_index2)
+#    display_frames_diff(filename, width, height, frame_index1, frame_index2)
 #    print(motion_vectors)

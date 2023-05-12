@@ -1,7 +1,14 @@
+# TODO
+- switch cli to argparse
+- add partial frame draw:
+  - not moved blocks
+  - moved blocks on new positions
+- test display_motion_vectors function - do not draw arrows\circles, only plain frame
 # Python
 pip install opencv-python
 # Run main:
-python ./q2_main.py waterfall_cif.yuv 352 288 8 hexbs
+python ./q2_main.py waterfall_cif.yuv 288 352 8 hexbs
+
 
 ## ffplay
 ### download
@@ -90,6 +97,19 @@ Processed 12 frames,   74855528 bits AVG PSNR Y 38.9601 U 38.7163 V 38.7247
  AVG QP: 38.2
 
 # Q2
+Motion Vectors:
+python ./q2_main.py ./stv/akiyo_cif.yuv 288 352 16 hexbs
+akiyo_16_1_2
+frame_index1 = 1
+frame_index2 = 2
+moved blocks count: 63, not moved blocks count: 333
+
+akiyo_16_1_20
+frame_index1 = 1
+frame_index2 = 20
+moved blocks count: 141, not moved blocks count: 255
+
+
 ./kvazaar.exe --input waterfall_cif.yuv --output waterfall.hevc --input-res=352x288
 yuv_reader.py [filename] [width] [height] [block_size] [matching_method]
 python ./yuv_reader_block_match.py waterfall_cif.yuv 352 288 8 hexbs
