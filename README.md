@@ -97,6 +97,7 @@ Processed 12 frames,   74855528 bits AVG PSNR Y 38.9601 U 38.7163 V 38.7247
  AVG QP: 38.2
 
 # Q2
+
 Motion Vectors:
 python ./q2_main.py ./stv/akiyo_cif.yuv 288 352 16 hexbs
 akiyo_16_1_2
@@ -114,42 +115,218 @@ moved blocks count: 141, not moved blocks count: 255
 yuv_reader.py [filename] [width] [height] [block_size] [matching_method]
 python ./yuv_reader_block_match.py waterfall_cif.yuv 352 288 8 hexbs
 
---threads <integer> 
- --me <string>          : Integer motion estimation algorithm [hexbs]
-                                   - hexbs: Hexagon Based Search
-                                   - tz:    Test Zone Search
-                                   - full:  Full Search
-                                   - full8, full16, full32, full64
-                                   - dia:   Diamond Search
---me-steps <integer>   : Motion estimation search step limit. Only
-                               affects 'hexbs' and 'dia'. [-1]
-
-## options
- resolution of the input file is not in the filename
-    --input-res=1920x1080
-default input format is 8-bit yuv420p for 8-bit and yuv420p10le for 10-bit
-    --input-format and --input-bitdepth
-
-      --(no-)psnr            : Calculate PSNR for frames. [enabled]
-      --me <string>          : Integer motion estimation algorithm [hexbs]
-                                   - hexbs: Hexagon Based Search
-                                   - tz:    Test Zone Search
-                                   - full:  Full Search
-                                   - full8, full16, full32, full64
-                                   - dia:   Diamond Search
-      --me-steps <integer>   : Motion estimation search step limit. Only
-                               affects 'hexbs' and 'dia'. [-1]
+# Q3 B
       --subme <integer>      : Fractional pixel motion estimation level [4]
                                    - 0: Integer motion estimation only
                                    - 1: + 1/2-pixel horizontal and vertical
                                    - 2: + 1/2-pixel diagonal
                                    - 3: + 1/4-pixel horizontal and vertical
                                    - 4: + 1/4-pixel diagonal
-      --pu-depth-inter <int>-<int> : Inter prediction units sizes [0-3]
-                                   - 0, 1, 2, 3: from 64x64 to 8x8
-      --pu-depth-intra <int>-<int> : Intra prediction units sizes [1-4]
-                                   - 0, 1, 2, 3, 4: from 64x64 to 4x4
-      --tr-depth-intra <int> : Transform split depth for intra blocks [0]
+
+## hexbs
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 1000000 --subme 0
+ Input: road_movie_1920x1080_25.yuv, output: road_movie_hexbs.hevc
+  Video size: 1920x1080 (input=1920x1080)
+ Processed 750 frames,  123436824 bits AVG PSNR Y 31.9923 U 41.3491 V 42.1204
+ Total CPU time: 31.442 s.
+ Encoding time: 31.435 s.
+ Encoding wall time: 31.434 s.
+ Encoding CPU usage: 100.00%
+ FPS: 23.86
+ Bitrate: 0.951 Mbps
+ AVG QP: 46.4
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 1000000 --subme 1
+  Processed 750 frames,   29932248 bits AVG PSNR Y 27.6941 U 38.1197 V 38.9464
+Total CPU time: 45.566 s.
+ Encoding time: 45.560 s.
+ Encoding wall time: 45.560 s.
+ Encoding CPU usage: 100.00%
+ FPS: 16.46
+ Bitrate: 0.952 Mbps
+ AVG QP: 46.2
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 1000000 --subme 2
+ Processed 750 frames,   29910432 bits AVG PSNR Y 27.7300 U 38.0613 V 38.8895
+ Total CPU time: 46.429 s.
+ Encoding time: 46.423 s.
+ Encoding wall time: 46.424 s.
+ Encoding CPU usage: 100.00%
+ FPS: 16.16
+ Bitrate: 0.951 Mbps
+ AVG QP: 46.1
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 1000000 --subme 3
+ Processed 750 frames,   29921712 bits AVG PSNR Y 27.8057 U 38.0966 V 38.9033
+ Total CPU time: 45.194 s.
+ Encoding time: 45.187 s.
+ Encoding wall time: 45.188 s.
+ Encoding CPU usage: 100.00%
+ FPS: 16.60
+ Bitrate: 0.951 Mbps
+ AVG QP: 46.0
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 1000000 --subme 4
+ Processed 750 frames,   29896224 bits AVG PSNR Y 27.8264 U 38.0779 V 38.9277
+ Total CPU time: 45.099 s.
+ Encoding time: 45.093 s.
+ Encoding wall time: 45.092 s.
+ Encoding CPU usage: 100.00%
+ FPS: 16.63
+ Bitrate: 0.950 Mbps
+ AVG QP: 45.9
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 2000000 --subme 0
+ Processed 750 frames,   60951912 bits AVG PSNR Y 29.1462 U 39.7932 V 40.5347
+ Total CPU time: 61.695 s.
+ Encoding time: 61.687 s.
+ Encoding wall time: 61.688 s.
+ Encoding CPU usage: 100.00%
+ FPS: 12.16
+ Bitrate: 1.938 Mbps
+ AVG QP: 43.3
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 2000000 --subme 1
+ Processed 750 frames,   60973408 bits AVG PSNR Y 29.2749 U 39.9103 V 40.6920
+ Total CPU time: 51.431 s.
+ Encoding time: 51.424 s.
+ Encoding wall time: 51.424 s.
+ Encoding CPU usage: 100.00%
+ FPS: 14.58
+ Bitrate: 1.938 Mbps
+ AVG QP: 43.3
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 2000000 --subme 2
+ Processed 750 frames,   60971208 bits AVG PSNR Y 29.3272 U 39.9398 V 40.7763
+ Total CPU time: 65.645 s.
+ Encoding time: 65.640 s.
+ Encoding wall time: 65.640 s.
+ Encoding CPU usage: 100.00%
+ FPS: 11.43
+ Bitrate: 1.938 Mbps
+ AVG QP: 43.3
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 2000000 --subme 3
+ Processed 750 frames,   60985976 bits AVG PSNR Y 29.4951 U 39.9671 V 40.8345
+ Total CPU time: 72.507 s.
+ Encoding time: 72.501 s.
+ Encoding wall time: 72.501 s.
+ Encoding CPU usage: 100.00%
+ FPS: 10.34
+ Bitrate: 1.939 Mbps
+ AVG QP: 43.0
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 2000000 --subme 4
+ Processed 750 frames,   60929096 bits AVG PSNR Y 29.4935 U 39.9461 V 40.8241
+ Total CPU time: 75.421 s.
+ Encoding time: 75.405 s.
+ Encoding wall time: 75.405 s.
+ Encoding CPU usage: 100.00%
+ FPS: 9.95
+ Bitrate: 1.937 Mbps
+ AVG QP: 43.1
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 4000000 --subme 0
+ Processed 750 frames,  122950168 bits AVG PSNR Y 31.4268 U 41.1370 V 41.8587
+ Total CPU time: 86.871 s.
+ Encoding time: 86.864 s.
+ Encoding wall time: 86.864 s.
+ Encoding CPU usage: 100.00%
+ FPS: 8.63
+ Bitrate: 3.908 Mbps
+ AVG QP: 39.1
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 4000000 --subme 1
+ Processed 750 frames,  123711560 bits AVG PSNR Y 31.8085 U 41.3179 V 42.0576
+ Total CPU time: 86.468 s.
+ Encoding time: 86.460 s.
+ Encoding wall time: 86.460 s.
+ Encoding CPU usage: 100.00%
+ FPS: 8.67
+ Bitrate: 3.933 Mbps
+ AVG QP: 38.6
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 4000000 --subme 2
+ Processed 750 frames,  123588248 bits AVG PSNR Y 31.8542 U 41.3205 V 42.0614
+ Total CPU time: 91.119 s.
+ Encoding time: 91.112 s.
+ Encoding wall time: 91.111 s.
+ Encoding CPU usage: 100.00%
+ FPS: 8.23
+ Bitrate: 3.929 Mbps
+ AVG QP: 38.6
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 4000000 --subme 3
+ Processed 750 frames,  123055168 bits AVG PSNR Y 32.0123 U 41.3490 V 42.0968
+ Total CPU time: 89.423 s.
+ Encoding time: 89.416 s.
+ Encoding wall time: 89.416 s.
+ Encoding CPU usage: 100.00%
+ FPS: 8.39
+ Bitrate: 3.912 Mbps
+ AVG QP: 38.4
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 4000000 --subme 4
+ Processed 750 frames,  123436824 bits AVG PSNR Y 31.9923 U 41.3491 V 42.1204
+ Total CPU time: 93.985 s.
+ Encoding time: 93.978 s.
+ Encoding wall time: 93.977 s.
+ Encoding CPU usage: 100.00%
+ FPS: 7.98
+ Bitrate: 3.924 Mbps
+ AVG QP: 38.5
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 8000000 --subme 0
+ Processed 750 frames,  246602312 bits AVG PSNR Y 34.2411 U 42.4859 V 43.0789
+ Total CPU time: 109.243 s.
+ Encoding time: 109.237 s.
+ Encoding wall time: 109.238 s.
+ Encoding CPU usage: 100.00%
+ FPS: 6.87
+ Bitrate: 7.839 Mbps
+ AVG QP: 34.4
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 8000000 --subme 1
+ Processed 750 frames,  248678320 bits AVG PSNR Y 34.7159 U 42.6736 V 43.2748
+ Total CPU time: 116.183 s.
+ Encoding time: 116.173 s.
+ Encoding wall time: 116.170 s.
+ Encoding CPU usage: 100.00%
+ FPS: 6.46
+ Bitrate: 7.905 Mbps
+ AVG QP: 33.8
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 8000000 --subme 2
+ Processed 750 frames,  248564864 bits AVG PSNR Y 34.8338 U 42.7232 V 43.3140
+ Total CPU time: 121.666 s.
+ Encoding time: 121.657 s.
+ Encoding wall time: 121.651 s.
+ Encoding CPU usage: 100.00%
+ FPS: 6.17
+ Bitrate: 7.902 Mbps
+ AVG QP: 33.6
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 8000000 --subme 3
+ Processed 750 frames,  245641288 bits AVG PSNR Y 34.9014 U 42.7284 V 43.3366
+ Total CPU time: 122.462 s.
+ Encoding time: 122.453 s.
+ Encoding wall time: 122.454 s.
+ Encoding CPU usage: 100.00%
+ FPS: 6.12
+ Bitrate: 7.809 Mbps
+ AVG QP: 33.6
+
+./kvazaar.exe --input road_movie_1920x1080_25.yuv --input-res=1920x1080 --output road_movie_hexbs.hevc --me hexbs --bitrate 8000000 --subme 4
+ Processed 750 frames,  246158448 bits AVG PSNR Y 34.9563 U 42.7223 V 43.3380
+ Total CPU time: 131.026 s.
+ Encoding time: 131.017 s.
+ Encoding wall time: 131.017 s.
+ Encoding CPU usage: 100.00%
+ FPS: 5.72
+ Bitrate: 7.825 Mbps
+ AVG QP: 33.5
+
+
 
 ## Usage
 $ docker run -i -a STDIN -a STDOUT ultravideo/kvazaar

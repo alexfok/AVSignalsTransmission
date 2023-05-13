@@ -14,13 +14,25 @@ def read_yuv_file(filename, width, height, frame_index):
     # Extract the Y channel and reshape into a 2D array
     y_plane = buffer[:num_pixels].reshape((height, width))
     height1, width1 = y_plane.shape
-    print('read_yuv_file2 frame height: {}, width: {}, height1: {}, width1: {}'.format(height, width, height1, width1))
+#    print('read_yuv_file2 frame height: {}, width: {}, height1: {}, width1: {}'.format(height, width, height1, width1))
 
     return y_plane
 
 def calculate_sad(block1, block2):
     # Calculate the sum of absolute differences (SAD) between two blocks
     return np.sum(np.abs(block1 - block2))
+
+def psnr(frame_index1, frame_index2):
+    frame1 = read_yuv_file(filename, width, height, frame_index1)
+    frame2 = read_yuv_file(filename, width, height, frame_index2)
+    # Calculate MSE
+    mse = np.mean((frame1 - frame2) ** 2)
+
+    # Calculate PSNR
+    max_pixel = 255.0
+    psnr = 10 * np.log10((max_pixel ** 2) / mse)
+
+    return psnr
 
 def block_matching(frame1, frame2, block_size, search_range):
     # Perform block matching between two frames
@@ -58,6 +70,7 @@ def frame_matching(filename, width, height, frame_index1, frame_index2, block_si
     #print('search_range: {}', search_range)
     #matches.append(block_matching(frame1, frame2, block_size, search_range))
     return block_matching(frame1, frame2, block_size, search_range)
+
 def scale_line(i,j,x,y):
     # x_i = abs(x-i)
     # if abs(x-i) < 5:
@@ -69,6 +82,7 @@ def scale_line(i,j,x,y):
     x_i = i + 5
     y_j = j + 5
     return x_i, y_j
+
 def display_motion_vectors(filename, width, height, motion_vectors, block_size, scale, frame_index):
     frame = read_yuv_file(filename, width, height, frame_index)
     # Convert the frame to RGB color space
@@ -103,78 +117,98 @@ def display_motion_vectors(filename, width, height, motion_vectors, block_size, 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def frame_matching_bad(filename, width, height, frame_index1, frame_index2, block_size, matching_method):
-    # Open the YUV file
-    yuv_file = open(filename, 'rb')
-    
-    # Calculate the number of pixels per frame
-    frame_size = width * height
-    
-    # Seek to the start of the desired frames
-    yuv_file.seek(frame_index1 * 3 // 2 * frame_size)
-    frame1_bytes = yuv_file.read(frame_size)
-    yuv_file.seek(frame_index2 * 3 // 2 * frame_size)
-    frame2_bytes = yuv_file.read(frame_size)
-
-    # Extract Y channel of the two frames
-    frame1_y = np.frombuffer(frame1_bytes, dtype=np.uint8).reshape(height, width)
-    frame2_y = np.frombuffer(frame2_bytes, dtype=np.uint8).reshape(height, width)
-
-    # Calculate the difference between the two frames
-    diff = np.abs(frame2_y.astype(np.int32) - frame1_y.astype(np.int32)).astype(np.uint8)
-    
-    # Perform block matching on the Y channel of the frames
-    motion_vectors = block_matching(frame1_y, frame2_y, block_size, matching_method)
-    
-    # Close the YUV file
-    yuv_file.close()
-    
-    # Display the first frame
-    plt.subplot(2, 2, 1)
-    plt.imshow(frame1_y, cmap='gray')
-    plt.title('Frame 1')
-    
-    # Display the second frame
-    plt.subplot(2, 2, 2)
-    plt.imshow(frame2_y, cmap='gray')
-    plt.title('Frame 2')
-    
-    # Display the difference between the frames
-    plt.subplot(2, 2, 3)
-    plt.imshow(diff, cmap='gray')
-    plt.title('Difference')
-    
-    # Display the motion vectors on the first frame
-    plt.subplot(2, 2, 4)
-    plt.imshow(frame1_y, cmap='gray')
-    plt.quiver(
-        np.arange(0, width, block_size), 
-        np.arange(0, height, block_size), 
-        motion_vectors[:, :, 1], 
-        motion_vectors[:, :, 0], 
-        color='r', 
-        units='xy', 
-        scale=1
-    )
-    plt.title('Motion Vectors')
-    
-    plt.show()
-
-def display_frames_diff(filename, width, height, frame_index1, frame_index2):
-    frame1 = read_yuv_file(filename, width, height, frame_index1)
-    frame2 = read_yuv_file(filename, width, height, frame_index2)
-    # Calculate absolute difference between the two frames
-    diff_frame = cv2.absdiff(frame1, frame2)
-    # Display the difference frame as an image
-    cv2.imshow('Difference Frame', diff_frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 def display_frame(filename, width, height, frame_index):
     frame = read_yuv_file(filename, width, height, frame_index)
     cv2.imshow(f"Motion vectors for frame {frame_index}", frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+def frame_diff(frame1, frame2):
+    # Calculate difference between frames
+    diff = cv2.absdiff(frame1, frame2)
+
+    return diff
+
+def display_frames_diff3(filename, width, height, frame_index1, frame_index2):
+    frame1 = read_yuv_file(filename, width, height, frame_index1)
+    frame2 = read_yuv_file(filename, width, height, frame_index2)
+    img = cv2.absdiff(frame1, frame2)
+
+    cv2.imshow(f"Frames difference {frame_index2}", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    return img
+
+def display_frames_diff4(filename, width, height, frame_index1, frame2):
+    frame1 = read_yuv_file(filename, width, height, frame_index1)
+#    frame2 = read_yuv_file(filename, width, height, frame_index2)
+    img = cv2.absdiff(frame1, frame2)
+
+    cv2.imshow(f"Frames difference {frame_index2}", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    # Calculate PSNR
+    # Calculate MSE
+    mse = np.mean((frame1 - frame2) ** 2)
+
+    # Calculate PSNR
+    max_pixel = 255.0
+    psnr = 10 * np.log10((max_pixel ** 2) / mse)
+    print('psnr between frame_index1: {} and reconstructed frame {}'.format(frame_index1, psnr))
+    return img
+
+def display_frames_diff(filename, width, height, motion_vectors, block_size, frame_index1, frame_index2):
+#    img = np.zeros([height, width,3],dtype=np.uint8)
+#    img[:] = 255
+#    cv2.imshow(f"White background", img)
+#    cv2.waitKey(0)
+#    cv2.destroyAllWindows()
+    frame1 = read_yuv_file(filename, width, height, frame_index2)
+    img = np.zeros_like(frame1)
+    img[:] = 255
+
+#    print('img.shape: {}'.format(img.shape))
+    for block in motion_vectors:
+        (i, j), best_match, min_sad = block
+        x, y = best_match
+        if (i, j) != (x,y):
+            # Draw block: from frame1 on img i,j, i+block_size,j+block_size
+            for ii in range(i, i + block_size, 1):
+                for jj in range(j, j + block_size, 1):
+                    img[ii,jj] = frame1[ii,jj]
+#                    print('draw line (ii,jj) ({},{})'.format(ii,jj))
+#                print('\n')
+    cv2.imshow(f"Frames difference {frame_index2}", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    return img
+
+def display_frames_diff2(filename, width, height, motion_vectors, block_size, frame_index1, frame_index2):
+#    img = np.zeros([height, width,3],dtype=np.uint8)
+#    img[:] = 255
+#    cv2.imshow(f"White background", img)
+#    cv2.waitKey(0)
+#    cv2.destroyAllWindows()
+    frame1 = read_yuv_file(filename, width, height, frame_index1)
+    frame2 = read_yuv_file(filename, width, height, frame_index2)
+    img = frame1
+
+#    print('img.shape: {}'.format(img.shape))
+    for block in motion_vectors:
+        (i, j), best_match, min_sad = block
+        x, y = best_match
+        if (i, j) != (x,y):
+            # Draw block: from frame1 on img i,j, i+block_size,j+block_size
+            for ii in range(x, x + block_size, 1):
+                for jj in range(y, y + block_size, 1):
+                    img[ii,jj] = frame2[ii,jj]
+#                    print('draw line (ii,jj) ({},{})'.format(ii,jj))
+#                print('\n')
+    cv2.imshow(f"Frames difference {frame_index2}", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    return img
+
 
 # Main code
 if __name__ == "__main__":
@@ -196,11 +230,17 @@ if __name__ == "__main__":
 
     #matches = frame_matching1(filename, width, height, block_size, matching_method)
     frame_index1 = 1
-    frame_index2 = 2
+    frame_index2 = 20
     scale = 0.5
     display_frame(filename, width, height, frame_index1)
     display_frame(filename, width, height, frame_index2)
     motion_vectors = frame_matching(filename, width, height, frame_index1, frame_index2, block_size, matching_method)
     display_motion_vectors(filename, width, height, motion_vectors, block_size, scale, frame_index2)
-#    display_frames_diff(filename, width, height, frame_index1, frame_index2)
+    frame1 = display_frames_diff(filename, width, height, motion_vectors, block_size, frame_index1, frame_index2)
+    frame2 = display_frames_diff2(filename, width, height, motion_vectors, block_size, frame_index1, frame_index2)
+
+    frame3 = display_frames_diff3(filename, width, height, frame_index1, frame_index2)
+    display_frames_diff4(filename, width, height, frame_index2, frame2)
+    psnr1 = psnr(frame_index1, frame_index2)
+    print('psnr between frame_index1: {}, frame_index2:{}: {}'.format(frame_index1, frame_index2, psnr1))
 #    print(motion_vectors)
