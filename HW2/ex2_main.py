@@ -19,6 +19,20 @@ def read_yuv_file(filename, width, height, frame_index):
 
     return y_plane
 
+
+def save_frame(filename, width, height, frame_index):
+    # Read the YUV data for a particular frame into a numpy array
+    # print('read_yuv_file1 frame height: {}, width: {}'.format(height, width))
+    num_pixels = width * height
+    with open(filename, "rb") as fp:
+        fp.seek(num_pixels * 3 // 2 * frame_index)
+        buffer = np.fromfile(fp, dtype=np.uint8, count=num_pixels * 3 // 2)
+
+    # Extract the Y channel and reshape into a 2D array
+    y_plane = buffer[:num_pixels].reshape((height, width))
+    img_file_name = os.path.splitext(os.path.basename(filename))[0]
+    cv2.imwrite(f"images/{img_file_name}.png",y_plane)
+
 def calculate_sad(frame1, frame2):
     # Calculate the sum of absolute differences (SAD) between two blocks
     return np.sum(np.abs(frame1 - frame2))
@@ -321,16 +335,17 @@ def inter_prediction_blocks_main(filename, frame_index1, qp, block_size = 4, hei
                 if prev_mod == min_mod:
                     mode_pred_list[min_mod] += 1
             prev_mod = min_mod
-            # Check Point
+            # Check Point - predicted frame
             check_frame1[start_y:start_y + block_size, start_x:start_x + block_size] = predicted_block
             # Predicted block is subtracted from source block to get residual block
             residual_block = frame[start_y:start_y + block_size, start_x:start_x + block_size] - predicted_block
-            # Check Point
+            # Check Point - residual frame
             check_frame2[start_y:start_y + block_size, start_x:start_x + block_size] = residual_block
             # residual block is transformed, quantized, inverse transformed and scaled to reconstruct source block
             residual_block_transformed = dct_transform_block_main(residual_block, qp = qp, block_size = block_size)
+            # reconstruct source block == predicted block + residual block
             reconstructed_block = predicted_block + residual_block_transformed
-            # Check Point
+            # Check Point - reconstructed frame
             check_frame3[start_y:start_y + block_size, start_x:start_x + block_size] = reconstructed_block
     # Display the predicted frame for the current mode
 
@@ -440,15 +455,12 @@ if __name__ == "__main__":
 #    frame_index2 = 20
 #    display_frame(filename, width, height, frame_index1)
 #    display_frame(filename, width, height, frame_index2)
+    save_frame(filename, width, height, frame_index1)
 
     modes_number = 9
     QP_List = [6, 12, 18, 30]
     for qp in QP_List:
         print(f'Run qp: {qp}')
         inter_prediction_blocks_main(filename, frame_index1, qp, block_size = 4, height = 288, width = 352)
-    test_intra_pred_modes(filename, frame_index1, qp = 6, block_size = 4, height = 288, width = 352)
-#    inter_prediction_yuv_main(filename, frame_index1, block_size = block_size, height = height, width = width)
-    # Define the QP value
-#    qp = 6
-#    dct_transform_main(filename, frame_index1, qp, height = 288, width = 352)
+#    test_intra_pred_modes(filename, frame_index1, qp = 6, block_size = 4, height = 288, width = 352)
 
